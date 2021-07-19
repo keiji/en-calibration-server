@@ -98,3 +98,10 @@ curl https://en.keiji.dev/diagnosis_keys/012345/list.json
 ```
 curl -O https://en.keiji.dev/diagnosis_keys/012345/diagnosis_keys-mpdysnkb-12-records-1-of-1.zip
 ```
+
+### Setup a cron job
+
+```
+# m h  dom mon dow   command
+*/10 * * * * ~/en-calibration-server/server/sample/generate_diagnosis_keys.sh
+```
