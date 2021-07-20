@@ -1,4 +1,4 @@
-# Exposure Notifications Simple Server
+# Exposure Notifications Calibration Server
 
 ## Setup
 
