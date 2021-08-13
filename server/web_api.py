@@ -58,11 +58,11 @@ MIMETYPE_ZIP = 'application/zip'
 @app.route("/diagnosis_keys/<cluster_id>/list.json", methods=['GET'])
 def diagnosis_keys_index(cluster_id):
     if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
+        return "[]"
 
     zip_store_path = os.path.join(config.base_path, cluster_id)
     if not os.path.exists(zip_store_path):
-        return "ClusterID:%s not found" % cluster_id, 404
+        return "[]"
 
     filtered_zip_list = list(filter(lambda f: f.endswith('.zip'), os.listdir(zip_store_path)))
 
