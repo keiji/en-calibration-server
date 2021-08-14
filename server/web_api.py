@@ -137,4 +137,4 @@ def put_diagnosis_keys(cluster_id, file_name):
         session.close()
 
     count = len(filtered_diagnosis_keys)
-    return '%d diagnosis_keys have been added.' % count, 200  # OK
+    return '', 204  # NoContent
