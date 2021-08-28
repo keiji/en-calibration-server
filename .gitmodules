@@ -1,3 +1,0 @@
-[submodule "exposure-notifications-server"]
-	path = exposure-notifications-server
-	url = https://github.com/google/exposure-notifications-server.git
