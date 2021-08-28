@@ -1,10 +1,12 @@
 import json
 import os
+import time
 
 from flask import Flask, send_file, request, Response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
+from common import convert_to_diagnosis_key, is_exists
 from scheme import DiagnosisKey, Base
 from configuration import Configuration
 
@@ -96,24 +98,6 @@ def diagnosis_keys(cluster_id, zip_file_name):
                      mimetype=MIMETYPE_ZIP)
 
 
-def _convert_to_diagnosis_key(json_obj, cluster_id):
-    diagnosis_key = DiagnosisKey()
-    diagnosis_key.cluster_id = cluster_id
-    diagnosis_key.key = json_obj['key']
-    diagnosis_key.reportType = json_obj['reportType']
-    diagnosis_key.rollingStartNumber = json_obj['rollingStartNumber']
-    diagnosis_key.rollingPeriod = json_obj['rollingPeriod']
-    diagnosis_key.transmissionRisk = json_obj['transmissionRisk']
-    return diagnosis_key
-
-
-def _is_exists(session, cluster_id, diagnosis_key):
-    return session.query(DiagnosisKey) \
-               .filter(DiagnosisKey.cluster_id == cluster_id) \
-               .filter(DiagnosisKey.key == diagnosis_key.key) \
-               .count() > 0
-
-
 @app.route("/diagnosis_keys/<cluster_id>/<file_name>", methods=['PUT'])
 def put_diagnosis_keys(cluster_id, file_name):
     if not _is_valid_cluster_id(cluster_id):
@@ -122,12 +106,12 @@ def put_diagnosis_keys(cluster_id, file_name):
     data = request.get_data()
     json_obj = json.loads(data)
     key_list = json_obj['temporaryExposureKeys']
-    diagnosis_keys = list(map(lambda obj: _convert_to_diagnosis_key(obj, cluster_id), key_list))
+    diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(obj, cluster_id), key_list))
 
     session = _create_session()
 
     filtered_diagnosis_keys = list(
-        filter(lambda diagnosis_key: not _is_exists(session, cluster_id, diagnosis_key), diagnosis_keys)
+        filter(lambda diagnosis_key: not is_exists(session, cluster_id, diagnosis_key), diagnosis_keys)
     )
 
     try:
