@@ -16,14 +16,6 @@
 openssl ecparam -genkey -name prime256v1 -noout -out private.pem
 ```
 
-### Build generate-export
-
-```
-git submodule update
-cd exposure-notifications-server/tools/export-generate
-go build
-```
-
 ### Edit `config.json`
 
 ```
