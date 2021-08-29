@@ -14,4 +14,6 @@ class DiagnosisKey(Base):
     rollingPeriod = Column(Integer)
     reportType = Column(Integer)
     transmissionRisk = Column(Integer)
+    daysSinceOnsetOfSymptoms = Column(Integer)
+    createdAt = Column(Integer)
     exported = Column(Boolean, default=False)
