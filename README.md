@@ -4,7 +4,6 @@
 
 ### Requirements
 
- * golang 1.16
  * openssl
  * Python 3
  * Python3-pip
