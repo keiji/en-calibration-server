@@ -1,13 +1,13 @@
 import json
 import os
-import time
+from http import HTTPStatus
 
 from flask import Flask, send_file, request, Response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
 from common import convert_to_diagnosis_key, is_exists
-from scheme import DiagnosisKey, Base
+from scheme import Base
 from configuration import Configuration
 
 assert 'CONFIG_PATH' in os.environ, 'Env "CONFIG_PATH" must be set.'
@@ -79,7 +79,7 @@ def diagnosis_keys_index(cluster_id):
     json_str = json.dumps(item_list, indent=4)
 
     return Response(response=json_str,
-                    status=200,
+                    status=HTTPStatus.OK,
                     mimetype=MIMETYPE_JSON)
 
 
@@ -90,7 +90,7 @@ def diagnosis_keys(cluster_id, zip_file_name):
 
     zip_file_path = os.path.join(config.base_path, cluster_id, zip_file_name)
     if not os.path.exists(zip_file_path):
-        return "ClusterID:%s, %s not found" % (cluster_id, zip_file_name), 404
+        return "ClusterID:%s, %s not found" % (cluster_id, zip_file_name), HTTPStatus.NOT_FOUND
 
     return send_file(zip_file_path,
                      as_attachment=True,
@@ -106,7 +106,11 @@ def put_diagnosis_keys(cluster_id, file_name):
     data = request.get_data()
     json_obj = json.loads(data)
     key_list = json_obj['temporaryExposureKeys']
-    diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(obj, cluster_id), key_list))
+
+    try:
+        diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(obj, cluster_id), key_list))
+    except KeyError as e:
+        return '', HTTPStatus.BAD_REQUEST
 
     session = _create_session()
 
@@ -121,4 +125,4 @@ def put_diagnosis_keys(cluster_id, file_name):
         session.close()
 
     count = len(filtered_diagnosis_keys)
-    return '', 204  # NoContent
+    return '', HTTPStatus.NO_CONTENT

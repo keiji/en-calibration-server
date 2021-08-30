@@ -6,7 +6,7 @@
       "rollingPeriod": 101,
       "reportType": 0,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 2
+      "daysSinceOnsetOfSymptoms": -5
     },
     {
       "key": "zm/FwRJykh6Bk95YdaTwyA==",
@@ -14,7 +14,7 @@
       "rollingPeriod": 98,
       "reportType": 1,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 0
+      "daysSinceOnsetOfSymptoms": -4
     },
     {
       "key": "14YCdvv7qUE2oER2vBghTQ==",
@@ -22,7 +22,7 @@
       "rollingPeriod": 144,
       "reportType": 2,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 3
+      "daysSinceOnsetOfSymptoms": -3
     },
     {
       "key": "2LFg3j8xw6E8S9GvU4PTig==",
@@ -30,7 +30,7 @@
       "rollingPeriod": 101,
       "reportType": 3,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -1
+      "daysSinceOnsetOfSymptoms": -2
     },
     {
       "key": "7ikZSyB+HlBJb6jPI/VDpQ==",
@@ -38,7 +38,7 @@
       "rollingPeriod": 101,
       "reportType": 1,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -2
+      "daysSinceOnsetOfSymptoms": -1
     },
     {
       "key": "J8M9hwaljNhm/sXwJz2KzA==",
@@ -46,7 +46,7 @@
       "rollingPeriod": 144,
       "reportType": 1,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -5
+      "daysSinceOnsetOfSymptoms": 0
     },
     {
       "key": "nQaTQojP/077L2pLRm1auA==",
@@ -54,7 +54,7 @@
       "rollingPeriod": 93,
       "reportType": 2,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 4
+      "daysSinceOnsetOfSymptoms": 1
     },
     {
       "key": "ni2p71djI0WTxRCUg9d7iQ==",
@@ -62,7 +62,7 @@
       "rollingPeriod": 93,
       "reportType": 1,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 8
+      "daysSinceOnsetOfSymptoms": 2
     },
     {
       "key": "BZ1ye4nJhPXzHA+upM/Q+w==",
@@ -70,7 +70,7 @@
       "rollingPeriod": 94,
       "reportType": 3,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -7
+      "daysSinceOnsetOfSymptoms": 3
     },
     {
       "key": "CQI4kLZ03QVPcbrHK6/bLA==",
@@ -78,14 +78,15 @@
       "rollingPeriod": 99,
       "reportType": 1,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -3
+      "daysSinceOnsetOfSymptoms": 4
     },
     {
       "key": "J7czR0QHXNVwvw0+qiwJwA==",
       "rollingStartNumber": 2704752,
       "rollingPeriod": 99,
       "reportType": 3,
-      "transmissionRisk": 7
+      "transmissionRisk": 7,
+      "daysSinceOnsetOfSymptoms": 5
     },
     {
       "key": "LuHkdAkEjb+coLGBkDg3Rg==",
@@ -93,7 +94,7 @@
       "rollingPeriod": 99,
       "reportType": 0,
       "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -9
+      "daysSinceOnsetOfSymptoms": 6
     }
   ]
 }
