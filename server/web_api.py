@@ -96,7 +96,7 @@ def diagnosis_keys(cluster_id, zip_file_name):
     if not _is_valid_cluster_id(cluster_id):
         return "ClusterID:%s invalid" % cluster_id
 
-    zip_file_path = os.path.join(config.base_path, cluster_id, zip_file_name)
+    zip_file_path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR, zip_file_name)
     if not os.path.exists(zip_file_path):
         return "ClusterID:%s, %s not found" % (cluster_id, zip_file_name), HTTPStatus.NOT_FOUND
 
