@@ -1,12 +1,13 @@
 import json
 import os
+from datetime import datetime
 from http import HTTPStatus
 
 from flask import Flask, send_file, request, Response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from common import convert_to_diagnosis_key, is_exists
+from common import convert_to_diagnosis_key, is_exists, FORMAT_SYMPTOM_ONSET_DATE
 from scheme import Base
 from configuration import Configuration
 
@@ -105,10 +106,19 @@ def put_diagnosis_keys(cluster_id, file_name):
 
     data = request.get_data()
     json_obj = json.loads(data)
+
+    idempotency_key = json_obj['idempotencyKey']
+    symptom_onset_date_str = json_obj['symptomOnsetDate']
+    symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_SYMPTOM_ONSET_DATE)
     key_list = json_obj['temporaryExposureKeys']
 
     try:
-        diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(obj, cluster_id), key_list))
+        diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(
+            obj,
+            cluster_id,
+            symptom_onset_date,
+            idempotency_key
+        ), key_list))
     except KeyError as e:
         return '', HTTPStatus.BAD_REQUEST
 
@@ -124,5 +134,11 @@ def put_diagnosis_keys(cluster_id, file_name):
     finally:
         session.close()
 
-    count = len(filtered_diagnosis_keys)
-    return '', HTTPStatus.NO_CONTENT
+    response_diagnosis_keys \
+        = list(map(lambda diagnosis_key: diagnosis_key.to_serializable_object(), filtered_diagnosis_keys))
+
+    return Response(
+        response=json.dumps(response_diagnosis_keys),
+        status=HTTPStatus.OK,
+        mimetype='application/json'
+    )

@@ -1,19 +1,49 @@
+from datetime import datetime, timezone
 import time
 
 from scheme import DiagnosisKey
 
-def convert_to_diagnosis_key(json_obj, cluster_id):
+# RFC3339
+FORMAT_SYMPTOM_ONSET_DATE = "%Y-%m-%dT%H:%M:%S.%f%z"
+
+TIMEWINDOW_IN_SEC = 60 * 10
+DEFAULT_TRANSMISSION_RISK = 4
+
+
+def convert_to_diagnosis_key(json_obj, cluster_id, symptom_onset_date, idempotency_key):
     diagnosis_key = DiagnosisKey()
     diagnosis_key.cluster_id = cluster_id
     diagnosis_key.key = json_obj['key']
     diagnosis_key.reportType = json_obj['reportType']
     diagnosis_key.rollingStartNumber = json_obj['rollingStartNumber']
     diagnosis_key.rollingPeriod = json_obj['rollingPeriod']
-    diagnosis_key.transmissionRisk = json_obj['transmissionRisk']
-    diagnosis_key.daysSinceOnsetOfSymptoms = json_obj['daysSinceOnsetOfSymptoms']
+    diagnosis_key.transmissionRisk = DEFAULT_TRANSMISSION_RISK
     diagnosis_key.createdAt = int(time.time())
 
+    diagnosis_key.daysSinceOnsetOfSymptoms = \
+        _calc_days_since_onset_of_symptoms(diagnosis_key.rollingStartNumber, symptom_onset_date)
+    diagnosis_key.primary_key = _gen_primary_key(idempotency_key, diagnosis_key)
+
     return diagnosis_key
+
+
+def _calc_days_since_onset_of_symptoms(rolling_start_number, symptom_onset_date):
+    rolling_start_epoch = rolling_start_number * TIMEWINDOW_IN_SEC
+    rolling_start_date = datetime.fromtimestamp(rolling_start_epoch, timezone.utc)
+
+    days_since_onset_of_symptoms = rolling_start_date - symptom_onset_date
+
+    return days_since_onset_of_symptoms.days
+
+
+def _gen_primary_key(idempotency_key, diagnosis_key):
+    return ','.join([
+        idempotency_key,
+        diagnosis_key.cluster_id,
+        diagnosis_key.key,
+        str(diagnosis_key.rollingStartNumber),
+        str(diagnosis_key.rollingPeriod)
+    ])
 
 
 def is_exists(session, cluster_id, diagnosis_key):

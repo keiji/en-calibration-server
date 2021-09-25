@@ -1,100 +1,78 @@
 {
+  "symptomOnsetDate": "2021-09-16T00:00:00.000+00:00",
+  "idempotencyKey": "9CCD4CEE-038C-4482-B693-857774D71655",
   "temporaryExposureKeys": [
     {
       "key": "WxrpdlTl/0riYFaEmPHYVg==",
-      "rollingStartNumber": 2704464,
+      "rollingStartNumber": 2718432,
       "rollingPeriod": 101,
-      "reportType": 0,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -5
+      "reportType": 0
     },
     {
       "key": "zm/FwRJykh6Bk95YdaTwyA==",
-      "rollingStartNumber": 2704464,
+      "rollingStartNumber": 2718576,
       "rollingPeriod": 98,
-      "reportType": 1,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -4
+      "reportType": 1
     },
     {
       "key": "14YCdvv7qUE2oER2vBghTQ==",
-      "rollingStartNumber": 2704464,
+      "rollingStartNumber": 2718720,
       "rollingPeriod": 144,
-      "reportType": 2,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -3
+      "reportType": 2
     },
     {
       "key": "2LFg3j8xw6E8S9GvU4PTig==",
-      "rollingStartNumber": 2704464,
+      "rollingStartNumber": 2718864,
       "rollingPeriod": 101,
-      "reportType": 3,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -2
+      "reportType": 3
     },
     {
       "key": "7ikZSyB+HlBJb6jPI/VDpQ==",
-      "rollingStartNumber": 2704464,
+      "rollingStartNumber": 2719008,
       "rollingPeriod": 101,
-      "reportType": 1,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": -1
+      "reportType": 1
     },
     {
       "key": "J8M9hwaljNhm/sXwJz2KzA==",
-      "rollingStartNumber": 2704608,
+      "rollingStartNumber": 2719152,
       "rollingPeriod": 144,
-      "reportType": 1,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 0
+      "reportType": 1
     },
     {
       "key": "nQaTQojP/077L2pLRm1auA==",
-      "rollingStartNumber": 2704608,
+      "rollingStartNumber": 2719296,
       "rollingPeriod": 93,
-      "reportType": 2,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 1
+      "reportType": 2
     },
     {
       "key": "ni2p71djI0WTxRCUg9d7iQ==",
-      "rollingStartNumber": 2704608,
+      "rollingStartNumber": 2719440,
       "rollingPeriod": 93,
-      "reportType": 1,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 2
+      "reportType": 1
     },
     {
       "key": "BZ1ye4nJhPXzHA+upM/Q+w==",
-      "rollingStartNumber": 2704752,
+      "rollingStartNumber": 2719584,
       "rollingPeriod": 94,
-      "reportType": 3,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 3
+      "reportType": 3
     },
     {
       "key": "CQI4kLZ03QVPcbrHK6/bLA==",
-      "rollingStartNumber": 2704752,
+      "rollingStartNumber": 2719728,
       "rollingPeriod": 99,
-      "reportType": 1,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 4
+      "reportType": 1
     },
     {
       "key": "J7czR0QHXNVwvw0+qiwJwA==",
-      "rollingStartNumber": 2704752,
+      "rollingStartNumber": 2719872,
       "rollingPeriod": 99,
-      "reportType": 3,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 5
+      "reportType": 3
     },
     {
       "key": "LuHkdAkEjb+coLGBkDg3Rg==",
-      "rollingStartNumber": 2704752,
+      "rollingStartNumber": 2720160,
       "rollingPeriod": 99,
-      "reportType": 0,
-      "transmissionRisk": 7,
-      "daysSinceOnsetOfSymptoms": 6
+      "reportType": 0
     }
   ]
 }
