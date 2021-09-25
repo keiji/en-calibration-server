@@ -4,7 +4,7 @@ import time
 from scheme import DiagnosisKey
 
 # RFC3339
-FORMAT_SYMPTOM_ONSET_DATE = "%Y-%m-%dT%H:%M:%S.%f%z"
+FORMAT_RFC3339 = "%Y-%m-%dT%H:%M:%S.%f%z"
 
 TIMEWINDOW_IN_SEC = 60 * 10
 DEFAULT_TRANSMISSION_RISK = 4

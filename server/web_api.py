@@ -1,7 +1,6 @@
 import hashlib
 import json
 import os
-import tempfile
 from datetime import datetime
 from http import HTTPStatus
 
@@ -9,7 +8,7 @@ from flask import Flask, send_file, request, Response
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from common import convert_to_diagnosis_key, is_exists, FORMAT_SYMPTOM_ONSET_DATE
+from common import convert_to_diagnosis_key, is_exists
 from scheme import Base
 from configuration import Configuration
 
@@ -257,7 +256,7 @@ def put_exposure_data(cluster_id):
         json.dump(json_obj, fp, indent=4)
 
     return Response(
-        response=json.dumps(json_str),
+        response=json.dumps(json_obj),
         status=HTTPStatus.CREATED,
         mimetype=MIMETYPE_JSON
     )

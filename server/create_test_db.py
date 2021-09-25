@@ -10,7 +10,7 @@ from absl import flags
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker, scoped_session
 
-from common import convert_to_diagnosis_key, is_exists, FORMAT_SYMPTOM_ONSET_DATE
+from common import convert_to_diagnosis_key, is_exists, FORMAT_RFC3339
 from scheme import Base
 
 FLAGS = flags.FLAGS
@@ -41,7 +41,7 @@ def main(argv):
     json_obj = json.loads(data)
     idempotency_key = json_obj['idempotencyKey']
     symptom_onset_date_str = json_obj['symptomOnsetDate']
-    symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_SYMPTOM_ONSET_DATE)
+    symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_RFC3339)
     key_list = json_obj['temporaryExposureKeys']
 
     diagnosis_keys = []
