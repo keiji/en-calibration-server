@@ -7,7 +7,7 @@ Base = declarative_base()
 class DiagnosisKey(Base):
     __tablename__ = 'diagnosis_keys'
 
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    primary_key = Column(String, primary_key=True)
     cluster_id = Column(String(length=6))
     key = Column(String(length=24), nullable=False)
     rollingStartNumber = Column(Integer)
@@ -17,3 +17,14 @@ class DiagnosisKey(Base):
     daysSinceOnsetOfSymptoms = Column(Integer)
     createdAt = Column(Integer)
     exported = Column(Boolean, default=False)
+
+    def to_serializable_object(self):
+        return {
+            'key': self.key,
+            'rollingStartNumber': self.rollingStartNumber,
+            'rollingPeriod': self.rollingPeriod,
+            'reportType': self.reportType,
+            'transmissionRisk': self.transmissionRisk,
+            'daysSinceOnsetOfSymptoms': self.daysSinceOnsetOfSymptoms,
+            'createdAt': self.createdAt,
+        }
