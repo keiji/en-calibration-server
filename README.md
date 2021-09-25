@@ -44,7 +44,9 @@ CONFIG_PATH=sample/config.json \
     uwsgi --ini uwsgi.ini
 ```
 
-### Put diagnosis-keys [from client]
+### Diagnosis=keys API
+
+#### Put diagnosis-keys [from client]
 
 ```
 curl -T sample/diagnosis_keys.json https://en.keiji.dev/diagnosis_keys/012345/
@@ -54,7 +56,7 @@ curl -T sample/diagnosis_keys.json https://en.keiji.dev/diagnosis_keys/012345/
 12 diagnosis_keys have been added.
 ```
 
-### Generate diagnosis-keys packages
+#### Generate diagnosis-keys packages
 
 ```
 CONFIG_PATH=sample/config.json \
@@ -68,7 +70,7 @@ CONFIG_PATH=sample/config.json \
 2021/07/18 15:17:28 Creating /tmp/en/012345/diagnosis_keys-mpdysnkb-12-records-1-of-1.zip
 ```
 
-### Get diagnosis-keys list
+#### Get diagnosis-keys list
 
 ```
 curl https://en.keiji.dev/diagnosis_keys/012345/list.json
@@ -84,15 +86,60 @@ curl https://en.keiji.dev/diagnosis_keys/012345/list.json
 ]
 ```
 
-### Get diagnosis-keys
+#### Get diagnosis-keys
 
 ```
 curl -O https://en.keiji.dev/diagnosis_keys/012345/diagnosis_keys-mpdysnkb-12-records-1-of-1.zip
 ```
 
-### Setup a cron job
+#### Setup a cron job
 
 ```
 # m h  dom mon dow   command
 */10 * * * * ~/en-calibration-server/server/sample/generate_diagnosis_keys.sh
+```
+
+----
+
+### ExposureData API [for Debug only]
+
+#### Put ExposureData
+
+```
+curl -T sample/exposure_data.json https://en.keiji.dev/exposure_data/012345/
+```
+
+```
+{
+    ...
+    "file_name": "0d0c3498c226102ce2ac6581cf853adaef1b5b89ee42f8e0b61c4a392ae1b009.json"
+}
+```
+
+#### Get ExposureData list
+
+```
+curl https://en.keiji.dev/exposure_data/012348/list.json
+```
+
+```
+[
+    {
+        "url": "https://en.keiji.dev/exposure_data/012348/0d0c3498c226102ce2ac6581cf853adaef1b5b89ee42f8e0b61c4a392ae1b009.json",
+        "created": 1632552825
+    }
+]
+```
+
+#### Get ExposureData
+
+```
+curl https://en.keiji.dev/exposure_data/012348/0d0c3498c226102ce2ac6581cf853adaef1b5b89ee42f8e0b61c4a392ae1b009.json
+```
+
+```
+{
+    ...
+     "file_name": "0d0c3498c226102ce2ac6581cf853adaef1b5b89ee42f8e0b61c4a392ae1b009.json"
+}
 ```
