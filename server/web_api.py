@@ -3,6 +3,7 @@ import json
 import os
 from datetime import datetime
 from http import HTTPStatus
+import uuid
 
 from flask import Flask, send_file, request, Response
 from sqlalchemy import create_engine
@@ -113,7 +114,7 @@ def put_diagnosis_keys(cluster_id, file_name):
     data = request.get_data()
     json_obj = json.loads(data)
 
-    idempotency_key = json_obj['idempotencyKey']
+    idempotency_key = uuid.uuid4().hex if 'idempotencyKey' not in json_obj else json_obj['idempotencyKey']
     symptom_onset_date_str = json_obj['symptomOnsetDate']
     symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_RFC3339)
     key_list = json_obj['temporaryExposureKeys']
