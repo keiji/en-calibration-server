@@ -25,6 +25,8 @@ SIGNATURE_ALGORITHM = '1.2.840.10045.4.3.2'
 FILENAME_BIN = 'export.bin'
 FILENAME_SIG = 'export.sig'
 
+DIAGNOSIS_KEYS_DIR = 'diagnosis_keys'
+
 
 def _setup_signature_info(signature_info, verification_key_id):
     signature_info.verification_key_id = str(verification_key_id)
@@ -140,7 +142,7 @@ def export_diagnosis_keys(config):
 
         for obj in cluster_objs:
             cluster_id = obj.cluster_id
-            output_dir = os.path.join(config.base_path, str(cluster_id))
+            output_dir = os.path.join(config.base_path, str(cluster_id), DIAGNOSIS_KEYS_DIR)
             os.makedirs(output_dir, exist_ok=True)
 
             diagnosis_keys = session.query(DiagnosisKey) \

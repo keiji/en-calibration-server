@@ -1,6 +1,6 @@
 {
   "region": 440,
-  "base_url": "https://en.keiji.dev/diagnosis_keys/",
+  "base_url": "https://en.keiji.dev/",
   "db_uri": "sqlite:////tmp/en/diagnosis_keys.db",
   "base_path": "/tmp/en",
   "export-generate_bin_path": "/home/ubuntu/en-calibration-server/exposure-notifications-server/tools/export-generate/export-generate",
