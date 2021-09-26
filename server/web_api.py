@@ -170,6 +170,9 @@ def exposure_data_index(cluster_id):
         timestamp = int(os.stat(path).st_mtime)
         item = {'url': url, 'created': timestamp}
         item_list.append(item)
+
+    item_list = sorted(item_list, key=lambda item: item['created'], reverse=True)
+
     json_str = json.dumps(item_list, indent=4)
 
     return Response(
