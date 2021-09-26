@@ -216,25 +216,7 @@ def _is_valid_exposure_data(exposure_data):
     return True
 
 
-def _strip_scan_instances(exposure_windows):
-    if exposure_windows is None:
-        return exposure_windows
-
-    for ew in exposure_windows:
-        ew['ScanInstances'] = None
-    return exposure_windows
-
-
-def _get_file_name(data):
-    json_obj = json.loads(data)
-
-    # Sort
-    json_obj['exposure_informations'] = sort_exposure_informations(json_obj['exposure_informations'])
-    json_obj['daily_summaries'] = sort_daily_summaries(json_obj['daily_summaries'])
-    json_obj['exposure_windows'] = sort_exposure_windows(json_obj['exposure_windows'])
-
-    json_obj['exposure_windows'] = _strip_scan_instances(json_obj['exposure_windows'])
-
+def _get_file_name(json_obj):
     json_str = json.dumps(json_obj)
     sha256 = hashlib.sha256()
     sha256.update(json_str.encode('UTF-8'))
@@ -272,7 +254,7 @@ def put_exposure_data(cluster_id):
     output_dir = os.path.join(config.base_path, str(cluster_id), EXPOSURE_DATA_DIR)
     os.makedirs(output_dir, exist_ok=True)
 
-    file_name = _get_file_name(data)
+    file_name = _get_file_name(json_obj)
 
     json_obj['file_name'] = file_name
     json_obj['uri'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
