@@ -257,7 +257,7 @@ def put_exposure_data(cluster_id):
     file_name = _get_file_name(json_obj)
 
     json_obj['file_name'] = file_name
-    json_obj['uri'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
+    json_obj['url'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
 
     file_path = os.path.join(output_dir, file_name)
     if os.path.exists(file_path):
