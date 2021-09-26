@@ -12,6 +12,7 @@ from sqlalchemy.orm import sessionmaker, scoped_session
 from common import convert_to_diagnosis_key, is_exists, FORMAT_RFC3339
 from scheme import Base
 from configuration import Configuration
+from sorter import sort_daily_summaries, sort_exposure_windows, sort_exposure_informations
 
 DIAGNOSIS_KEYS_DIR = 'diagnosis_keys'
 EXPOSURE_DATA_DIR = 'exposure_data'
@@ -215,6 +216,32 @@ def _is_valid_exposure_data(exposure_data):
     return True
 
 
+def _strip_scan_instances(exposure_windows):
+    if exposure_windows is None:
+        return exposure_windows
+
+    for ew in exposure_windows:
+        ew['ScanInstances'] = None
+    return exposure_windows
+
+
+def _get_file_name(data):
+    json_obj = json.loads(data)
+
+    # Sort
+    json_obj['exposure_informations'] = sort_exposure_informations(json_obj['exposure_informations'])
+    json_obj['daily_summaries'] = sort_daily_summaries(json_obj['daily_summaries'])
+    json_obj['exposure_windows'] = sort_exposure_windows(json_obj['exposure_windows'])
+
+    json_obj['exposure_windows'] = _strip_scan_instances(json_obj['exposure_windows'])
+
+    json_str = json.dumps(json_obj)
+    sha256 = hashlib.sha256()
+    sha256.update(json_str.encode('UTF-8'))
+
+    return '%s.json' % sha256.hexdigest()
+
+
 @app.route("/exposure_data/<cluster_id>/", methods=['PUT'])
 def put_exposure_data(cluster_id):
     if not _is_valid_cluster_id(cluster_id):
@@ -230,6 +257,11 @@ def put_exposure_data(cluster_id):
     data = request.get_data()
     json_obj = json.loads(data)
 
+    # Sort
+    json_obj['exposure_informations'] = sort_exposure_informations(json_obj['exposure_informations'])
+    json_obj['daily_summaries'] = sort_daily_summaries(json_obj['daily_summaries'])
+    json_obj['exposure_windows'] = sort_exposure_windows(json_obj['exposure_windows'])
+
     if not _is_valid_exposure_data(json_obj):
         return Response(
             response='{}',
@@ -240,10 +272,7 @@ def put_exposure_data(cluster_id):
     output_dir = os.path.join(config.base_path, str(cluster_id), EXPOSURE_DATA_DIR)
     os.makedirs(output_dir, exist_ok=True)
 
-    json_str = json.dumps(json_obj)
-    sha256 = hashlib.sha256()
-    sha256.update(json_str.encode('UTF-8'))
-    file_name = '%s.json' % sha256.hexdigest()
+    file_name = _get_file_name(data)
 
     json_obj['file_name'] = file_name
     json_obj['uri'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
