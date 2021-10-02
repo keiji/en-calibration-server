@@ -44,12 +44,12 @@ CONFIG_PATH=sample/config.json \
     uwsgi --ini uwsgi.ini
 ```
 
-### Diagnosis=keys API
+### Diagnosis-keys API
 
 #### Put diagnosis-keys [from client]
 
 ```
-curl -T sample/diagnosis_keys.json https://en.keiji.dev/diagnosis_keys/012345/
+curl -T sample/diagnosis_keys.json https://en.keiji.dev/diagnosis_keys/012345/diagnosis-keys.json
 ```
 
 ```
