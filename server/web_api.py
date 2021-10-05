@@ -224,7 +224,7 @@ def _get_file_name(json_obj):
     return '%s.json' % sha256.hexdigest()
 
 
-@app.route("/exposure_data/<cluster_id>/", methods=['PUT'])
+@app.route("/exposure_data/<cluster_id>/", methods=['PUT'], strict_slashes=False)
 def put_exposure_data(cluster_id):
     if not _is_valid_cluster_id(cluster_id):
         return "ClusterID:%s invalid" % cluster_id
