@@ -229,7 +229,8 @@ def _convert_exposure_windows_to_csv(cluster_id, identifier, json_obj):
     if exposure_windows is None:
         return "", HTTPStatus.NOT_FOUND
 
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, "exposure_windows-%s.csv" % identifier)
+    file_name = "%s-exposure_windows.csv" % identifier
+    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
         with open(file_path, mode='w') as fp:
             writer = csv.writer(fp)
@@ -250,10 +251,12 @@ def _convert_exposure_windows_to_csv(cluster_id, identifier, json_obj):
                         si["MinAttenuationDb"], si["SecondsSinceLastScan"], si["TypicalAttenuationDb"],
                     ])
 
-    with open(file_path) as fp:
-        return Response(response=fp.read(),
-                        status=HTTPStatus.OK,
-                        mimetype=MIMETYPE_CSV)
+    return send_file(
+        file_path,
+        as_attachment=True,
+        attachment_filename=file_name,
+        mimetype=MIMETYPE_CSV
+    )
 
 
 def _write_csv_row(dateMillisSinceEpoch, daily_summary, type, csv_writer):
@@ -274,7 +277,8 @@ def _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj):
     if daily_summaries is None:
         return "", HTTPStatus.NOT_FOUND
 
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, "daily_summaries-%s.csv" % identifier)
+    file_name = "%s-daily_summaries.csv" % identifier
+    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
         with open(file_path, mode='w') as fp:
             writer = csv.writer(fp)
@@ -288,10 +292,12 @@ def _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj):
                 _write_csv_row(dateMillisSinceEpoch, ds, "RecursiveSummary", writer)
                 _write_csv_row(dateMillisSinceEpoch, ds, "SelfReportedSummary", writer)
 
-    with open(file_path) as fp:
-        return Response(response=fp.read(),
-                        status=HTTPStatus.OK,
-                        mimetype=MIMETYPE_CSV)
+    return send_file(
+        file_path,
+        as_attachment=True,
+        attachment_filename=file_name,
+        mimetype=MIMETYPE_CSV
+    )
 
 
 @app.route("/exposure_data/<cluster_id>/<identifier>/<type>", methods=['GET'])
