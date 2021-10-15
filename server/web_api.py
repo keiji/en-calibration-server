@@ -332,7 +332,7 @@ def _get_identifier(json_obj):
     sha256 = hashlib.sha256()
     sha256.update(json_str.encode('UTF-8'))
 
-    return '%s.json' % sha256.hexdigest()
+    return sha256.hexdigest()
 
 
 @app.route("/exposure_data/<cluster_id>/", methods=['PUT'], strict_slashes=False)
