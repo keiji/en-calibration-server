@@ -1,5 +1,11 @@
 {
   "symptomOnsetDate": "2021-09-16T00:00:00.000+00:00",
+  "regions": [
+    440
+  ],
+  "sub_regions": [
+    "212458"
+  ],
   "idempotencyKey": "9CCD4CEE-038C-4482-B693-857774D71655",
   "temporaryExposureKeys": [
     {

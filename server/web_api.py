@@ -56,26 +56,19 @@ def _create_session():
     )
 
 
-def _is_valid_cluster_id(cluster_id):
-    if len(cluster_id) != 6:
-        return False
-    if not str.isnumeric(cluster_id):
-        return False
-
-    return True
-
-
 MIMETYPE_JSON = 'application/json'
 MIMETYPE_ZIP = 'application/zip'
 MIMETYPE_CSV = 'text/csv'
 
 
-@app.route("/diagnosis_keys/<cluster_id>/list.json", methods=['GET'])
-def diagnosis_keys_index(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "[]"
+@app.route("/diagnosis_keys/<region>/list.json", methods=['GET'])
+def _diagnosis_keys_index(region):
+    return diagnosis_keys_index(region, '')
 
-    zip_store_path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR)
+
+@app.route("/diagnosis_keys/<region>/<sub_region>/list.json", methods=['GET'])
+def diagnosis_keys_index(region, sub_region):
+    zip_store_path = os.path.join(config.base_path, region, sub_region, DIAGNOSIS_KEYS_DIR)
     if not os.path.exists(zip_store_path):
         return "[]"
 
@@ -84,12 +77,13 @@ def diagnosis_keys_index(cluster_id):
     item_list = []
 
     for file_name in filtered_zip_list:
-        url = os.path.join(config.base_url, DIAGNOSIS_KEYS_DIR, cluster_id, file_name)
-        path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR, file_name)
+        url = os.path.join(config.base_url, DIAGNOSIS_KEYS_DIR, region, sub_region, file_name)
+        path = os.path.join(config.base_path, region, sub_region, DIAGNOSIS_KEYS_DIR, file_name)
         created_timestamp = os.stat(path).st_mtime
         created_datetime = datetime.fromtimestamp(created_timestamp).astimezone(JST)
         item = {
-            'region': config.region,
+            'region': region,
+            'sub_region': sub_region,
             'url': url,
             'created': int(created_timestamp),
             'datetime': created_datetime.strftime(FORMAT_RFC3339)
@@ -102,14 +96,16 @@ def diagnosis_keys_index(cluster_id):
                     mimetype=MIMETYPE_JSON)
 
 
-@app.route("/diagnosis_keys/<cluster_id>/<zip_file_name>", methods=['GET'])
-def diagnosis_keys(cluster_id, zip_file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
+@app.route("/diagnosis_keys/<region>/<zip_file_name>", methods=['GET'])
+def _diagnosis_keys(region, zip_file_name):
+    return diagnosis_keys(region, '', zip_file_name)
 
-    zip_file_path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR, zip_file_name)
+
+@app.route("/diagnosis_keys/<region>/<sub_region>/<zip_file_name>", methods=['GET'])
+def diagnosis_keys(region, sub_region, zip_file_name):
+    zip_file_path = os.path.join(config.base_path, region, sub_region, DIAGNOSIS_KEYS_DIR, zip_file_name)
     if not os.path.exists(zip_file_path):
-        return "ClusterID:%s, %s not found" % (cluster_id, zip_file_name), HTTPStatus.NOT_FOUND
+        return "Region:%s, SubRegion %s, %s not found" % (region, sub_region, zip_file_name), HTTPStatus.NOT_FOUND
 
     return send_file(zip_file_path,
                      as_attachment=True,
@@ -117,33 +113,46 @@ def diagnosis_keys(cluster_id, zip_file_name):
                      mimetype=MIMETYPE_ZIP)
 
 
-@app.route("/diagnosis_keys/<cluster_id>/<file_name>", methods=['PUT'])
-def put_diagnosis_keys(cluster_id, file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
+@app.route("/diagnosis_keys/<file_name>", methods=['PUT'])
+def put_diagnosis_keys(file_name):
     data = request.get_data()
     json_obj = json.loads(data)
 
     idempotency_key = uuid.uuid4().hex if 'idempotencyKey' not in json_obj else json_obj['idempotencyKey']
     symptom_onset_date_str = json_obj['symptomOnsetDate']
     symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_RFC3339)
+
+    regions = json_obj['regions']
+
+    sub_regions = []
+    if 'sub_regions' in json_obj:
+        sub_regions = json_obj['sub_regions']
+
+    # Region Level
+    sub_regions.append('')
+
     key_list = json_obj['temporaryExposureKeys']
 
+    diagnosis_keys = []
+
     try:
-        diagnosis_keys = list(map(lambda obj: convert_to_diagnosis_key(
-            obj,
-            cluster_id,
-            symptom_onset_date,
-            idempotency_key
-        ), key_list))
+        for region in regions:
+            for sub_region in sub_regions:
+                keys = list(map(lambda obj: convert_to_diagnosis_key(
+                    obj,
+                    str(region),
+                    str(sub_region),
+                    symptom_onset_date,
+                    idempotency_key
+                ), key_list))
+                diagnosis_keys.extend(keys)
     except KeyError as e:
         return '', HTTPStatus.BAD_REQUEST
 
     session = _create_session()
 
     filtered_diagnosis_keys = list(
-        filter(lambda diagnosis_key: not is_exists(session, cluster_id, diagnosis_key), diagnosis_keys)
+        filter(lambda diagnosis_key: not is_exists(session, diagnosis_key), diagnosis_keys)
     )
 
     try:
@@ -162,12 +171,14 @@ def put_diagnosis_keys(cluster_id, file_name):
     )
 
 
-@app.route("/exposure_data/<cluster_id>/list.json", methods=['GET'])
-def exposure_data_index(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "[]"
+@app.route("/exposure_data/<region>/list.json", methods=['GET'])
+def _exposure_data_index(region):
+    return exposure_data_index(region, '')
 
-    json_store_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR)
+
+@app.route("/exposure_data/<region>/<sub_region>/list.json", methods=['GET'])
+def exposure_data_index(region, sub_region):
+    json_store_path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR)
     if not os.path.exists(json_store_path):
         return "[]"
 
@@ -177,12 +188,12 @@ def exposure_data_index(cluster_id):
 
     for file_name in filtered_json_list:
         identifier, _ = os.path.splitext(file_name)
-        json_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
-        exposure_windows_csv_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, identifier,
+        json_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, region, sub_region, file_name)
+        exposure_windows_csv_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, region, sub_region, identifier,
                                                 "exposure_windows.csv")
-        daily_summaries_csv_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, identifier,
+        daily_summaries_csv_url = os.path.join(config.base_url, EXPOSURE_DATA_DIR, region, sub_region, identifier,
                                                "daily_summaries.csv")
-        path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
+        path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR, file_name)
         created_timestamp = os.stat(path).st_mtime
         created_datetime = datetime.fromtimestamp(created_timestamp).astimezone(JST)
         item = {
@@ -205,14 +216,16 @@ def exposure_data_index(cluster_id):
     )
 
 
-@app.route("/exposure_data/<cluster_id>/<file_name>", methods=['GET'])
-def exposure_data(cluster_id, file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
+@app.route("/exposure_data/<region>/<file_name>", methods=['GET'])
+def _exposure_data(region, file_name):
+    return exposure_data(region, '', file_name)
 
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
+
+@app.route("/exposure_data/<region>/<sub_region>/<file_name>", methods=['GET'])
+def exposure_data(region, sub_region, file_name):
+    file_path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
-        return "ClusterID:%s, %s not found" % (cluster_id, file_name), HTTPStatus.NOT_FOUND
+        return "Region:%s, SubRegion:%s, %s not found" % (region, sub_region, file_name), HTTPStatus.NOT_FOUND
 
     with open(file_path, 'r') as fp:
         content = fp.read()
@@ -223,14 +236,14 @@ def exposure_data(cluster_id, file_name):
         )
 
 
-def _convert_exposure_windows_to_csv(cluster_id, identifier, json_obj):
+def _convert_exposure_windows_to_csv(region, sub_region, identifier, json_obj):
     exposure_windows = json_obj['exposure_windows']
 
     if exposure_windows is None:
         return "", HTTPStatus.NOT_FOUND
 
     file_name = "%s-exposure_windows.csv" % identifier
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
+    file_path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
         with open(file_path, mode='w') as fp:
             writer = csv.writer(fp)
@@ -271,14 +284,14 @@ def _write_csv_row(dateMillisSinceEpoch, daily_summary, type, csv_writer):
         ])
 
 
-def _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj):
+def _convert_daily_summaries_to_csv(region, sub_region, identifier, json_obj):
     daily_summaries = json_obj['daily_summaries']
 
     if daily_summaries is None:
         return "", HTTPStatus.NOT_FOUND
 
     file_name = "%s-daily_summaries.csv" % identifier
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
+    file_path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
         with open(file_path, mode='w') as fp:
             writer = csv.writer(fp)
@@ -300,12 +313,14 @@ def _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj):
     )
 
 
-@app.route("/exposure_data/<cluster_id>/<identifier>/<type>", methods=['GET'])
-def exposure_data_detail(cluster_id, identifier, type):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
+@app.route("/exposure_data/<region>/<identifier>/<type>", methods=['GET'])
+def _exposure_data_detail(region, identifier, type):
+    return exposure_data_detail(region, '', identifier, type)
 
-    file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, "%s.json" % identifier)
+
+@app.route("/exposure_data/<region>/<sub_region>/<identifier>/<type>", methods=['GET'])
+def exposure_data_detail(region, sub_region, identifier, type):
+    file_path = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR, "%s.json" % identifier)
     if not os.path.exists(file_path):
         return "", HTTPStatus.NOT_FOUND
 
@@ -313,9 +328,9 @@ def exposure_data_detail(cluster_id, identifier, type):
         json_obj = json.load(fp)
 
         if type == 'exposure_windows.csv':
-            return _convert_exposure_windows_to_csv(cluster_id, identifier, json_obj)
+            return _convert_exposure_windows_to_csv(region, sub_region, identifier, json_obj)
         elif type == 'daily_summaries.csv':
-            return _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj)
+            return _convert_daily_summaries_to_csv(region, sub_region, identifier, json_obj)
 
 
 def _is_valid_exposure_data(exposure_data):
@@ -341,11 +356,13 @@ def _get_identifier(json_obj):
     return sha256.hexdigest()
 
 
-@app.route("/exposure_data/<cluster_id>/", methods=['PUT'], strict_slashes=False)
-def put_exposure_data(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
+@app.route("/exposure_data/<region>", methods=['PUT'], strict_slashes=False)
+def _put_exposure_data(region):
+    return put_exposure_data(region, '')
 
+
+@app.route("/exposure_data/<region>/<sub_region>", methods=['PUT'], strict_slashes=False)
+def put_exposure_data(region, sub_region):
     if request.content_length > MAXIMUM_CONTENT_LENGTH:
         return Response(
             response='{}',
@@ -368,14 +385,14 @@ def put_exposure_data(cluster_id):
             mimetype=MIMETYPE_JSON
         )
 
-    output_dir = os.path.join(config.base_path, str(cluster_id), EXPOSURE_DATA_DIR)
+    output_dir = os.path.join(config.base_path, region, sub_region, EXPOSURE_DATA_DIR)
     os.makedirs(output_dir, exist_ok=True)
 
     identifier = _get_identifier(json_obj)
     file_name = "%s.json" % identifier
 
     json_obj['file_name'] = file_name
-    json_obj['url'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, cluster_id, file_name)
+    json_obj['url'] = os.path.join(config.base_url, EXPOSURE_DATA_DIR, region, sub_region, file_name)
 
     file_path = os.path.join(output_dir, file_name)
     if os.path.exists(file_path):

@@ -8,7 +8,8 @@ class DiagnosisKey(Base):
     __tablename__ = 'diagnosis_keys'
 
     primary_key = Column(String, primary_key=True)
-    cluster_id = Column(String(length=6))
+    region = Column(String)
+    sub_region = Column(String)
     key = Column(String(length=24), nullable=False)
     rollingStartNumber = Column(Integer)
     rollingPeriod = Column(Integer)

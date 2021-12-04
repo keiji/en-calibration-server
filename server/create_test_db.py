@@ -15,7 +15,6 @@ from scheme import Base
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string("db_path", "./test.db", "Database path")
-flags.DEFINE_string("cluster_id", '123456', "Cluster ID")
 flags.DEFINE_string("input_json_path", "./sample/diagnosis_keys.json", "Sample JSON path")
 
 MAX_DELAY_IN_SEC = 2
@@ -42,12 +41,21 @@ def main(argv):
     idempotency_key = json_obj['idempotencyKey']
     symptom_onset_date_str = json_obj['symptomOnsetDate']
     symptom_onset_date = datetime.strptime(symptom_onset_date_str, FORMAT_RFC3339)
+
+    regions = json_obj['regions']
+    sub_regions = json_obj['sub_regions']
+
+    # Region level
+    sub_regions.append('')
+
     key_list = json_obj['temporaryExposureKeys']
 
     diagnosis_keys = []
-    for key in key_list:
-        time.sleep(rand.random() * MAX_DELAY_IN_SEC)
-        diagnosis_keys.append(convert_to_diagnosis_key(key, FLAGS.cluster_id, symptom_onset_date, idempotency_key))
+    for region in regions:
+        for sub_region in sub_regions:
+            for key in key_list:
+                time.sleep(rand.random() * MAX_DELAY_IN_SEC)
+                diagnosis_keys.append(convert_to_diagnosis_key(key, region, sub_region, symptom_onset_date, idempotency_key))
 
     session = scoped_session(
         sessionmaker(
@@ -58,7 +66,7 @@ def main(argv):
     )
 
     filtered_diagnosis_keys = list(
-        filter(lambda diagnosis_key: not is_exists(session, FLAGS.cluster_id, diagnosis_key), diagnosis_keys)
+        filter(lambda diagnosis_key: not is_exists(session, diagnosis_key), diagnosis_keys)
     )
 
     try:
