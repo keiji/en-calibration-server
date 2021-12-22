@@ -137,6 +137,15 @@ def put_diagnosis_keys(file_name):
 
     try:
         for region in regions:
+            keys = list(map(lambda obj: convert_to_diagnosis_key(
+                obj,
+                str(region),
+                None,
+                symptom_onset_date,
+                idempotency_key
+            ), key_list))
+            diagnosis_keys.extend(keys)
+
             for sub_region in sub_regions:
                 keys = list(map(lambda obj: convert_to_diagnosis_key(
                     obj,
