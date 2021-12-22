@@ -14,7 +14,7 @@ def convert_to_diagnosis_key(json_obj, region, sub_region, symptom_onset_date, i
     diagnosis_key = DiagnosisKey()
     diagnosis_key.region = region
     diagnosis_key.sub_region = sub_region
-    diagnosis_key.key = json_obj['key']
+    diagnosis_key.key = json_obj['keyData']
     diagnosis_key.reportType = json_obj['reportType']
     diagnosis_key.rollingStartNumber = json_obj['rollingStartNumber']
     diagnosis_key.rollingPeriod = json_obj['rollingPeriod']

@@ -131,7 +131,7 @@ def put_diagnosis_keys(file_name):
     # Region Level
     sub_regions.append('')
 
-    key_list = json_obj['temporaryExposureKeys']
+    key_list = json_obj['keys']
 
     diagnosis_keys = []
 
