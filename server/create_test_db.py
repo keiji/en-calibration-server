@@ -48,7 +48,7 @@ def main(argv):
     # Region level
     sub_regions.append('')
 
-    key_list = json_obj['temporaryExposureKeys']
+    key_list = json_obj['keys']
 
     diagnosis_keys = []
     for region in regions:

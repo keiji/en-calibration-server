@@ -21,7 +21,7 @@ class DiagnosisKey(Base):
 
     def to_serializable_object(self):
         return {
-            'key': self.key,
+            'keyData': self.key,
             'rollingStartNumber': self.rollingStartNumber,
             'rollingPeriod': self.rollingPeriod,
             'reportType': self.reportType,
