@@ -50,13 +50,13 @@ def _setup_key(diagnosis_key, key):
     return key
 
 
-def _export_generate(cluster_id, verification_id, diagnosis_keys, output_dir, batch_num=1, batch_size=1):
+def _export_generate(region, verification_id, diagnosis_keys, output_dir, batch_num=1, batch_size=1):
     output_path = os.path.join(output_dir, FILENAME_BIN)
 
     tekObj = tek.TemporaryExposureKeyExport()
     tekObj.start_timestamp = min(map(lambda dk: dk.createdAt, diagnosis_keys))
     tekObj.end_timestamp = max(map(lambda dk: dk.createdAt, diagnosis_keys))
-    tekObj.region = cluster_id
+    tekObj.region = region
     tekObj.batch_num = batch_num
     tekObj.batch_size = batch_size
 
@@ -109,7 +109,7 @@ def _compress_zip(export_bin_path, export_sig_path, output_dir):
 def export_diagnosis_keys(config):
     assert os.path.exists(config.base_path), '%s not exists' % config.base_path
 
-    fp = open(config.signing_key_path)
+    fp = open(config.signing_key_path, mode="r")
     signing_key = SigningKey.from_pem(fp.read(), hashlib.sha256)
     fp.close()
 
@@ -129,41 +129,58 @@ def export_diagnosis_keys(config):
     )
 
     try:
-        cluster_objs = session.query(DiagnosisKey.cluster_id, DiagnosisKey.exported) \
+        regions = session.query(DiagnosisKey.region, DiagnosisKey.exported) \
             .filter(DiagnosisKey.exported == False) \
             .distinct() \
             .all()
 
-        if len(cluster_objs) == 0:
-            print('No updated-cluster found.')
+        if len(regions) == 0:
+            print('No update found.')
             return
 
-        print('%d updated-cluster found.' % len(cluster_objs))
+        for region_obj in regions:
+            region = region_obj.region
 
-        for obj in cluster_objs:
-            cluster_id = obj.cluster_id
-            output_dir = os.path.join(config.base_path, str(cluster_id), DIAGNOSIS_KEYS_DIR)
-            os.makedirs(output_dir, exist_ok=True)
+            print('Region:%s' % region)
 
-            diagnosis_keys = session.query(DiagnosisKey) \
-                .filter(DiagnosisKey.cluster_id == cluster_id) \
+            sub_regions = session.query(DiagnosisKey.sub_region, DiagnosisKey.exported) \
                 .filter(DiagnosisKey.exported == False) \
+                .filter(DiagnosisKey.region == region) \
+                .distinct() \
                 .all()
 
-            print('%d new diagnosis-keys have been found.' % len(diagnosis_keys))
+            if len(sub_regions) == 0:
+                print('Region:%s, No update found.' % (region_obj.region))
+                return
 
-            export_bin_path = _export_generate(cluster_id, config.region, diagnosis_keys, output_dir)
-            export_sig_path = _export_tek_signs(export_bin_path, config.region, signing_key, output_dir)
-            export_zip_path = _compress_zip(export_bin_path, export_sig_path, output_dir)
+            for sub_region_obj in sub_regions:
+                sub_region = sub_region_obj.sub_region
 
-            os.remove(export_bin_path)
-            os.remove(export_sig_path)
+                print('SubRegion:%s' % sub_region)
 
-            for diagnosis_key in diagnosis_keys:
-                diagnosis_key.exported = True
-            session.commit()
+                output_dir = os.path.join(config.base_path, region, sub_region, DIAGNOSIS_KEYS_DIR)
+                os.makedirs(output_dir, exist_ok=True)
 
-            print("export_completed: %s" % export_zip_path)
+                diagnosis_keys = session.query(DiagnosisKey) \
+                    .filter(DiagnosisKey.region == region) \
+                    .filter(DiagnosisKey.sub_region == sub_region) \
+                    .filter(DiagnosisKey.exported == False) \
+                    .all()
+
+                print('%d new diagnosis-keys have been found.' % len(diagnosis_keys))
+
+                export_bin_path = _export_generate(region, region, diagnosis_keys, output_dir)
+                export_sig_path = _export_tek_signs(export_bin_path, region, signing_key, output_dir)
+                export_zip_path = _compress_zip(export_bin_path, export_sig_path, output_dir)
+
+                os.remove(export_bin_path)
+                os.remove(export_sig_path)
+
+                for diagnosis_key in diagnosis_keys:
+                    diagnosis_key.exported = True
+                session.commit()
+
+                print("exported: %s" % export_zip_path)
 
     finally:
         session.close()
