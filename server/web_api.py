@@ -56,15 +56,6 @@ def _create_session():
     )
 
 
-def _is_valid_cluster_id(cluster_id):
-    if len(cluster_id) != 6:
-        return False
-    if not str.isnumeric(cluster_id):
-        return False
-
-    return True
-
-
 MIMETYPE_JSON = 'application/json'
 MIMETYPE_ZIP = 'application/zip'
 MIMETYPE_CSV = 'text/csv'
@@ -72,9 +63,6 @@ MIMETYPE_CSV = 'text/csv'
 
 @app.route("/diagnosis_keys/<cluster_id>/list.json", methods=['GET'])
 def diagnosis_keys_index(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "[]"
-
     zip_store_path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR)
     if not os.path.exists(zip_store_path):
         return "[]"
@@ -104,9 +92,6 @@ def diagnosis_keys_index(cluster_id):
 
 @app.route("/diagnosis_keys/<cluster_id>/<zip_file_name>", methods=['GET'])
 def diagnosis_keys(cluster_id, zip_file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
     zip_file_path = os.path.join(config.base_path, cluster_id, DIAGNOSIS_KEYS_DIR, zip_file_name)
     if not os.path.exists(zip_file_path):
         return "ClusterID:%s, %s not found" % (cluster_id, zip_file_name), HTTPStatus.NOT_FOUND
@@ -119,9 +104,6 @@ def diagnosis_keys(cluster_id, zip_file_name):
 
 @app.route("/diagnosis_keys/<cluster_id>/<file_name>", methods=['PUT'])
 def put_diagnosis_keys(cluster_id, file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
     data = request.get_data()
     json_obj = json.loads(data)
 
@@ -164,9 +146,6 @@ def put_diagnosis_keys(cluster_id, file_name):
 
 @app.route("/exposure_data/<cluster_id>/list.json", methods=['GET'])
 def exposure_data_index(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "[]"
-
     json_store_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR)
     if not os.path.exists(json_store_path):
         return "[]"
@@ -207,9 +186,6 @@ def exposure_data_index(cluster_id):
 
 @app.route("/exposure_data/<cluster_id>/<file_name>", methods=['GET'])
 def exposure_data(cluster_id, file_name):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
     file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, file_name)
     if not os.path.exists(file_path):
         return "ClusterID:%s, %s not found" % (cluster_id, file_name), HTTPStatus.NOT_FOUND
@@ -302,9 +278,6 @@ def _convert_daily_summaries_to_csv(cluster_id, identifier, json_obj):
 
 @app.route("/exposure_data/<cluster_id>/<identifier>/<type>", methods=['GET'])
 def exposure_data_detail(cluster_id, identifier, type):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
     file_path = os.path.join(config.base_path, cluster_id, EXPOSURE_DATA_DIR, "%s.json" % identifier)
     if not os.path.exists(file_path):
         return "", HTTPStatus.NOT_FOUND
@@ -343,9 +316,6 @@ def _get_identifier(json_obj):
 
 @app.route("/exposure_data/<cluster_id>/", methods=['PUT'], strict_slashes=False)
 def put_exposure_data(cluster_id):
-    if not _is_valid_cluster_id(cluster_id):
-        return "ClusterID:%s invalid" % cluster_id
-
     if request.content_length > MAXIMUM_CONTENT_LENGTH:
         return Response(
             response='{}',
