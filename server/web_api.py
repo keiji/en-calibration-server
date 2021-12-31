@@ -113,8 +113,17 @@ def diagnosis_keys(region, sub_region, zip_file_name):
                      mimetype=MIMETYPE_ZIP)
 
 
+@app.route("/diagnosis_keys/v3/diagnosis", methods=['PUT'], strict_slashes=False)
+def _put_diagnosis_keys():
+    return put_diagnosis_keys()
+
+
 @app.route("/diagnosis_keys/<file_name>", methods=['PUT'])
-def put_diagnosis_keys(file_name):
+def __put_diagnosis_keys(file_name):
+    return put_diagnosis_keys()
+
+
+def put_diagnosis_keys():
     data = request.get_data()
     json_obj = json.loads(data)
 
