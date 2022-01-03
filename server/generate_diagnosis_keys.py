@@ -131,6 +131,7 @@ def export_diagnosis_keys(config):
     try:
         regions = session.query(DiagnosisKey.region, DiagnosisKey.exported) \
             .filter(DiagnosisKey.exported == False) \
+            .filter(DiagnosisKey.sub_region == '') \
             .distinct() \
             .all()
 
@@ -157,6 +158,8 @@ def export_diagnosis_keys(config):
                 sub_region = sub_region_obj.sub_region
 
                 print('SubRegion:%s' % sub_region)
+                if sub_region is None:
+                    sub_region = ''
 
                 output_dir = os.path.join(config.base_path, region, sub_region, DIAGNOSIS_KEYS_DIR)
                 os.makedirs(output_dir, exist_ok=True)
@@ -168,6 +171,9 @@ def export_diagnosis_keys(config):
                     .all()
 
                 print('%d new diagnosis-keys have been found.' % len(diagnosis_keys))
+
+                if len(diagnosis_keys) == 0:
+                    continue
 
                 export_bin_path = _export_generate(region, region, diagnosis_keys, output_dir)
                 export_sig_path = _export_tek_signs(export_bin_path, region, signing_key, output_dir)

@@ -134,8 +134,8 @@ def put_diagnosis_keys():
     regions = json_obj['regions']
 
     sub_regions = []
-    if 'sub_regions' in json_obj:
-        sub_regions = json_obj['sub_regions']
+    if 'subRegions' in json_obj:
+        sub_regions = json_obj['subRegions']
 
     # Region Level
     sub_regions.append('')
