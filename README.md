@@ -31,7 +31,7 @@ openssl ecparam -genkey -name prime256v1 -noout -out private.pem
 ### Install requirements
 
 ```
-pip3 -r server/requirements.txt
+pip3 install -r server/requirements.txt
 ```
 
 ## How to use
